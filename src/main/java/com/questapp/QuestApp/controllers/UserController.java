@@ -1,8 +1,10 @@
 package com.questapp.QuestApp.controllers;
 
 import com.questapp.QuestApp.entities.User;
+import com.questapp.QuestApp.exceptions.UserNotFoundException;
 import com.questapp.QuestApp.responses.UserResponse;
 import com.questapp.QuestApp.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +31,11 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public UserResponse getUser(@PathVariable Long userId) {
-        return new UserResponse(userService.getUserById(userId));
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User with id " + userId + " not found");
+        }
+        return new UserResponse(user);
     }
 
     @PutMapping("/{userId}")
@@ -39,11 +45,25 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User with id " + userId + " already not exists");
+        }
         userService.deleteUserById(userId);
     }
 
     @GetMapping("/activity/{userId}")
     public List<Object> getUserActivity(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User with id " + userId + " not found");
+        }
         return userService.getUserActivity(userId);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private void handleUserNotFoundException() {
+
     }
 }
