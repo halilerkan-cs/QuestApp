@@ -1,5 +1,5 @@
 This "QuestApp" application simulates a blog application. 
-< br / >Users can 
+<br/>Users can 
 * share posts, 
 * write comments, 
 * like posts, 
